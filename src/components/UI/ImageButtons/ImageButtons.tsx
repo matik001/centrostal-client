@@ -1,5 +1,6 @@
+import { forwardRef } from "react";
 import { Button, ButtonProps } from "react-bootstrap";
-import { ArrowRepeat, CardText, ChevronDoubleRight, ChevronRight, Display, Laptop, PlusLg, SaveFill, XCircle } from "react-bootstrap-icons";
+import { ArrowRepeat, CardText, Laptop, PlusLg, SaveFill, XCircle } from "react-bootstrap-icons";
 import SquareButton from "../SquareButton/SquareButton";
 
 export const EditButton = (props:ButtonProps)=>(
@@ -18,18 +19,18 @@ export const SaveButton = (props:ButtonProps)=>(
             style={{
                 marginRight: 6
             }}/>
-        Zapisz
+        {props.children ?? 'Zapisz'} 
     </Button>
 )
 
-export const AddButton = (props:ButtonProps)=>(
-    <Button variant='primary' {...props}>
+export const AddButton = forwardRef((props:ButtonProps, ref:any)=>(
+    <Button variant='primary' {...props} ref={ref}>
         <PlusLg size="12" style={{
                 marginRight: 6
             }}/>
         Dodaj
     </Button>
-)
+))
 export const CloseButton = (props:ButtonProps)=>(
     <Button variant='secondary' {...props}>
         <XCircle style={{

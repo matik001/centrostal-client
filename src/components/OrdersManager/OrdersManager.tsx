@@ -1,13 +1,12 @@
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { Alert } from 'react-bootstrap';
-import { ArrowRepeat, PlusLg } from 'react-bootstrap-icons';
-import { createOrder, getOrders, Order, OrderItem, orderToCreateOrder, updateOrder } from '../../api/centrostalApi';
+import { cancelOrder, createOrder, finishOrder, getOrders, Order, OrderItem, orderToCreateOrder, updateOrder } from '../../api/centrostalApi';
 import safeFetch from '../../helpers/safeFetch';
 import { AddModalButton, RefreshModalButton } from '../UI/ImageButtons/ImageButtons';
 import Spinner from '../UI/Spinner/Spinner';
-import SquareButton from '../UI/SquareButton/SquareButton';
 import EditOrderModal from './EditOrderModal/EditOrderModal';
 import OrdersList from './OrdersList/OrdersList';
+import ViewOrderModal from './ViewOrderModal/ViewOrderModal';
 
 export interface OrdersManagerProps{
 }
@@ -67,16 +66,34 @@ const OrdersManager = ({}:OrdersManagerProps)=>{
     
     const saveEditingHandler = useCallback(async ()=>{
         setIsEditing(false);
-        if(editingType === 'creating'){
+        if(editingType === 'creating')
             await createOrder(orderToCreateOrder(editingOrder));
-            await refreshOrders();
-        }
-        else{
+        else
             await updateOrder(editingOrder.id, orderToCreateOrder(editingOrder));
-            await refreshOrders();
-        }
+        
+        await refreshOrders();
         setEditingOrder(createNewOrder());
     }, [editingOrder, editingType, refreshOrders]);
+
+    const cancelOrderEditingHandler = useCallback(async ()=>{
+        await updateOrder(editingOrder.id, orderToCreateOrder(editingOrder));
+        await cancelOrder(editingOrder.id);
+        setIsEditing(false);
+        await refreshOrders();
+        setEditingOrder(createNewOrder());
+
+
+    }, [editingOrder, refreshOrders]);
+
+    const finishOrderEditingHandler = useCallback(async ()=>{
+        await updateOrder(editingOrder.id, orderToCreateOrder(editingOrder));
+        await finishOrder(editingOrder.id);
+        setIsEditing(false);
+        await refreshOrders();
+        setEditingOrder(createNewOrder());
+
+    }, [editingOrder, refreshOrders]);
+
 
     const addOrderItemHandler = useCallback((orderItem:OrderItem)=>{
         setEditingOrder(order=>{
@@ -127,7 +144,7 @@ const OrdersManager = ({}:OrdersManagerProps)=>{
         setViewingOrder(order);
         setIsViewingOrder(true);
     }, []);
-    const hideViewingOrderHandler = useCallback(()=>{
+    const closeViewingOrderHandler = useCallback(()=>{
         setViewingOrder(null);
         setIsViewingOrder(false);
     }, []);
@@ -150,8 +167,14 @@ const OrdersManager = ({}:OrdersManagerProps)=>{
                                 <EditOrderModal show={isEditing} type={editingType} handleClose={closeEditingHandler}
                                     handleSave={saveEditingHandler} order={editingOrder} handleAddOrderItem={addOrderItemHandler}
                                     handleChangeOrderItem={changeOrderItemHandler} handleRemoveOrderItem={removeOrderItemHandler}
+                                    handleCancel={cancelOrderEditingHandler} handleFinish={finishOrderEditingHandler}
                                      />
                             ) : null}
+                            {isViewingOrder ? (
+                                <ViewOrderModal handleClose={closeViewingOrderHandler}
+                                                order={viewingOrder as Order}
+                                                show={isViewingOrder} />
+                            ): null}
                             <OrdersList orders={orders} 
                                         handleViewOrder={showViewingOrderHandler} 
                                         handleEditOrder={startEditingHandler} />

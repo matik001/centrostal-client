@@ -1,22 +1,33 @@
 import axios from 'axios'
+import combinedStore from '../store';
 import * as localStorageManager from '../store/localStorageManager'
 
 const BASE_URL = 'https://localhost:44322';
 
 const centrostalApiAxios = axios.create({
     baseURL: BASE_URL,
-    timeout: 3000,
+    timeout: 3000
 })
-const authConfig = {
-    headers: {  },
-}
-export const updateAuthConfig = (token:string|null)=>{
+centrostalApiAxios.interceptors.response.use(response => {
+    return response;
+ }, error => {
+   if (error?.response?.status === 401) {
+    combinedStore.dispatch({
+        type: 'AUTH_LOGOUT'
+    });
+   }
+   return error;
+ });
 
-    authConfig.headers = {
-        Authorization: `Bearer ${token}`
-    }
+const getAuthConfig = ()=>{
+    const config = {
+        headers: {
+            Authorization: `Bearer ${localStorageManager.getStr(localStorageManager.LocalStorageItemName.TOKEN)}`
+        }
+    };
+    return config;
 }
-updateAuthConfig(localStorageManager.getStr(localStorageManager.LocalStorageItemName.TOKEN));
+
 
 
 export interface LoginResponseData{
@@ -52,58 +63,14 @@ export const register = async (data:RegistrationData)=>{
     return res as LoginResponseData;
 };
 
-
-export interface ItemTemplate{
-    id:number;
-    name: string;
-    number:number;
-    currents:number[];
-    steelTypes:string[];
-}
-export interface UpdateItemTemplate{
-    name: string;
-    number:number;
-    currents:number[];
-    steelTypes:string[];
-}
-export const getItemTemplates = async (pattern:string = "")=>{    
-    const res = (await centrostalApiAxios.get("/item/template", {
-        ...authConfig,
-        params: {
-            pattern: pattern
-        }
-    })).data;
-    
-    return res as ItemTemplate[];
-}
-export const createItemTemplate = async (data:UpdateItemTemplate)=>{
-    const res = (await centrostalApiAxios.post("/item/template", data, authConfig)).data;
-    return res;
-}
-export const getItemTemplate = async (id:number)=>{
-    const res = (await centrostalApiAxios.get(`/item/template/${id}`, authConfig)).data;
-
-    return res as ItemTemplate;
-}
-
-export const updateItemTemplate = async (id:number, itemTemplate:UpdateItemTemplate)=>{
-    await centrostalApiAxios.put(`/item/template/${id}`, itemTemplate, authConfig);
-}
-
-export const deleteItemTemplate = async (id:number)=>{
-    await centrostalApiAxios.delete(`/item/template/${id}`, authConfig);
-}
-
-
 export const getSteelTypes = async ()=>{    
-    const res = (await centrostalApiAxios.get("/steel", authConfig)).data;
+    const res = (await centrostalApiAxios.get("/steel", getAuthConfig())).data;
 
     return res as string[];
 }
 
 
-
-export interface Item{
+export interface CreateItem{
     id:number;
     name: string;
     number:number;
@@ -111,6 +78,9 @@ export interface Item{
     current:number;
     isOriginal:boolean;
     steelType:string;
+}
+export interface Item extends CreateItem{
+    id:number;
 }
 export interface GetItemsFilter{
     pattern?:string;
@@ -128,10 +98,28 @@ export const getItems = async (filters?:GetItemsFilter)=>{
         steelType: undefined
     };
     const res = (await centrostalApiAxios.get("/item", {
-        ...authConfig,
+        ...getAuthConfig(),
         params: filters
     })).data;
     return res as Item[];
+}
+export const getItem = async (id:number)=>{    
+    const res = (await centrostalApiAxios.get(`/item/${id}`, {
+        ...getAuthConfig()
+    })).data;
+    return res as Item;
+}
+export const createItem = async (item:CreateItem)=>{    
+    const res = (await centrostalApiAxios.post(`/item`, item, {
+        ...getAuthConfig()
+    })).data;
+    return res as Item;
+}
+export const updateItem = async (id:number, item:CreateItem)=>{    
+    const res = (await centrostalApiAxios.put(`/item/${id}`, item, {
+        ...getAuthConfig()
+    })).data;
+    return res as Item;
 }
 
 
@@ -157,7 +145,7 @@ const orderDtoToOrder = (elem:any)=>{
     return elem as Order;
 };
 export const getOrders = async ()=>{    
-    const res = (await centrostalApiAxios.get("/order", authConfig)).data;
+    const res = (await centrostalApiAxios.get("/order", getAuthConfig())).data;
     const orders = res.map((x:any)=>orderDtoToOrder(x));
         return orders as Order[];
 }
@@ -182,17 +170,25 @@ export const orderToCreateOrder = (order:Order)=>{
 }
 
 export const createOrder = async (createOrder:CreateOrder)=>{    
-    const res = (await centrostalApiAxios.post("/order", createOrder, authConfig)).data;
+    const res = (await centrostalApiAxios.post("/order", createOrder, getAuthConfig())).data;
     return res;
 }
 
 export const updateOrder = async (id:number, order:CreateOrder)=>{
-    await centrostalApiAxios.put(`/order/${id}`, order, authConfig);
+    await centrostalApiAxios.put(`/order/${id}`, order, getAuthConfig());
+}
+
+export const finishOrder = async (id:number)=>{
+    await centrostalApiAxios.patch(`/order/${id}/finish`, null, getAuthConfig());
+}
+
+export const cancelOrder = async (id:number)=>{
+    await centrostalApiAxios.patch(`/order/${id}/cancel`, null, getAuthConfig());
 }
 
 export const searchItemNames = async (pattern:string)=>{
     const res = (await centrostalApiAxios.get("/item/names", {
-        ...authConfig,
+        ...getAuthConfig(),
         params: {
             pattern: pattern
         }

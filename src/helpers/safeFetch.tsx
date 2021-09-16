@@ -2,8 +2,9 @@ import { AxiosError } from "axios";
 
 const safeFetch = async <T extends unknown>(  func: ()=>Promise<T>,
                     setErrorMsg: (error:string|null)=>void,
-                    setLoading: (loading:boolean)=>void 
+                    setLoading: (loading:boolean)=>void
                     )=>{
+                        
     setLoading(true);
     setErrorMsg(null);
 
@@ -12,9 +13,11 @@ const safeFetch = async <T extends unknown>(  func: ()=>Promise<T>,
         res = await func();
     } catch (err) {
         const error = err as AxiosError;
-        setErrorMsg(error?.response?.data || error.message);
+        const data = error?.response?.data;
+        const errorFromServer = data && data.errors && Object.values(data.errors).join("\n");
+        setErrorMsg(errorFromServer || error.message);
     }
-
+    // if(isNewest == null || isNewest)
     setLoading(false);
     return res;
 }

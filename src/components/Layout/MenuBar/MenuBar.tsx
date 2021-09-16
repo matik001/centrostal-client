@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { Container, Nav, Navbar } from 'react-bootstrap';
 import NavItem from './NavItem/NavItem';
 
@@ -14,9 +15,12 @@ const MenuBar = ({isAuthenticated, isAdmin}:MenuBarProps)=>{
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                 <Navbar.Collapse id="responsive-navbar-nav">
                     <Nav className="me-auto">
-                        <NavItem link="/items/rules" text="Właściwości towarów"/>
-                        <NavItem link="/items" text="Magazyn"/>
-                        <NavItem link="/orders" text="Zamówienia"/>
+                        {isAuthenticated ?
+                            <Fragment>
+                                <NavItem link="/items" text="Magazyn"/>
+                                <NavItem link="/orders" text="Zamówienia"/>
+                            </Fragment>
+                        : null}
                     </Nav>
                     <Nav>
                         {isAuthenticated ?

@@ -1,11 +1,10 @@
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { Alert, Table } from 'react-bootstrap';
-import { ArrowRepeat } from 'react-bootstrap-icons';
 import { getItems, Item} from '../../api/centrostalApi';
 import safeFetch from '../../helpers/safeFetch';
+import ItemsFilter from '../ItemsFilter/ItemsFilter';
 import { RefreshModalButton } from '../UI/ImageButtons/ImageButtons';
 import Spinner from '../UI/Spinner/Spinner';
-import SquareButton from '../UI/SquareButton/SquareButton';
 
 export interface ItemsViewerProps{
 }
@@ -16,63 +15,95 @@ const ItemsViewer = ({}:ItemsViewerProps)=>{
     const [isLoading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState(null as string|null);
 
+    const [itemNamePattern, setItemNamePattern] = useState("");
+    const [current, setCurrent] = useState(null as string|null);    
+    const [steelType, setSteelType] = useState(null as string|null);
+    const [isOriginal, setOriginal] = useState(null as boolean|null);
+    const [refresh, setRefresh] = useState(false);
+
+    useEffect(()=>{
+        let isNewest = true;
+        
+        safeFetch(async ()=>{
+            let candidates = await getItems({
+                current: parseInt(current as string) || undefined,
+                isOriginal: isOriginal ?? undefined,
+                pattern: itemNamePattern,
+                steelType: steelType as string
+            });
+            if(candidates === null || candidates === undefined)
+                candidates = [];
+
+            if(isNewest)
+                setItems(candidates);
+        }, setErrorMsg, setLoading)
+        return ()=>{
+            isNewest = false;
+        }
+    }, [itemNamePattern, current, steelType, isOriginal, refresh]);
 
     const refreshItemTemplates = useCallback(async ()=>{
-        safeFetch(async ()=>{
-            const newItem = await getItems();
-            setItems(newItem);
-        }, setErrorMsg, setLoading);
+        setRefresh(old=>!old);
     }, []);
 
     
-    useEffect(()=>{
-        refreshItemTemplates();
-    },[refreshItemTemplates]);
     return  (
-        <Fragment>
+        <div style={{
+            width: "94%",
+            marginLeft: "auto",
+            marginRight: "auto",
+            marginTop: "3%"
+        }}>
+            <ItemsFilter current={current}
+                handleCurrentChange={setCurrent}
+                steelType={steelType}
+                handleSteelChange={setSteelType}
+                namePattern={itemNamePattern}
+                handleNamePatternChange={setItemNamePattern}
+                isOriginal={isOriginal}
+                handleIsOriginalChange={setOriginal}
+                itemCandidates={items}
+            />
             {isLoading ? <Spinner /> : (
-                <div style={{
-                    width: "94%",
-                    marginLeft: "auto",
-                    marginRight: "auto",
-                    marginTop: "3%"
-                }}>
+                <div>
                     {errorMsg ? (
                         <Alert variant="danger">
                             {errorMsg}
                         </Alert>
                     ) : (
-                        <Table striped bordered hover variant="dark">
-                            <thead>
-                                <tr>
-                                    <th>Id</th>
-                                    <th>Nazwa</th>
-                                    <th>Numer</th>
-                                    <th>Oryginał</th>
-                                    <th>Rodzaj stali</th>
-                                    <th>Prąd</th>
-                                    <th>Ilość</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {items.map(item=>(
-                                    <tr key={item.id}>
-                                        <td>{item.id}</td>
-                                        <td>{item.name}</td>
-                                        <td>{item.number}</td>
-                                        <td>{item.isOriginal ? "Oryginał" : "Zamiennik"}</td>
-                                        <td>{item.steelType}</td>
-                                        <td>{item.current}A</td>
-                                        <td>{item.amount}</td>
+                        <Fragment>
+                            <Table striped bordered hover variant="dark">
+                                <thead>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Nazwa</th>
+                                        <th>Numer</th>
+                                        <th>Rodzaj stali</th>
+                                        <th>Prąd</th>
+                                        <th>Jakość</th>
+                                        <th>Ilość</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </Table>
+                                </thead>
+                                <tbody>
+                                    {items.map(item=>(
+                                        <tr key={item.id}>
+                                            <td>{item.id}</td>
+                                            <td>{item.name}</td>
+                                            <td>{item.number}</td>
+                                            <td>{item.steelType}</td>
+                                            <td>{item.current}A</td>
+                                            <td>{item.isOriginal ? "Oryginał" : "Zamiennik"}</td>
+                                            <td>{item.amount}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </Table>
+                        </Fragment>
                     )}
                     <RefreshModalButton onClick={refreshItemTemplates} style={{bottom: 30}} />
                 </div>
             )}
-        </Fragment>
+        </div>
     );
 };
 

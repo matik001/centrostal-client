@@ -1,19 +1,22 @@
-import { Fragment, useCallback, useEffect } from "react";
-import { Filter, PlusLg, SaveFill, XCircle } from "react-bootstrap-icons";
+import { Fragment, useCallback, useEffect, useRef } from "react";
+import { Toggles, Trash } from "react-bootstrap-icons";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
-import { FormSelect } from "react-bootstrap";
+import { Alert, Overlay, Popover } from "react-bootstrap";
 import { useState } from "react";
-import { getItems, getItemTemplates, Item, Order, OrderItem, searchItemNames } from "../../../api/centrostalApi";
-import SearchInput from "../../UI/Input/SearchInput/SearchInput";
-import ToggleButton from "../../UI/ToggleButton/ToggleButton";
-import OrderItemList from "./OrderItemList/OrderItemList";
+import { getItems, Item, Order, OrderItem } from "../../../api/centrostalApi";
+import OrderItemList from "../OrderItemList/OrderItemList";
 import { AddButton, CloseButton, SaveButton } from "../../UI/ImageButtons/ImageButtons";
+import Spinner from "../../UI/Spinner/Spinner";
+import safeFetch from "../../../helpers/safeFetch";
+import ItemsFilter from "../../ItemsFilter/ItemsFilter";
 
 export interface EditOrderModalProps{
   show: boolean;
   handleClose: ()=>void;
   handleSave: ()=>void;
+  handleCancel: ()=>void;
+  handleFinish: ()=>void;
   order: Order;
   type: 'creating'|'editing';
   handleAddOrderItem: (orderItem:OrderItem)=>void;
@@ -22,106 +25,39 @@ export interface EditOrderModalProps{
 }
 
 const EditOrderModal = ({show, handleClose, handleSave, order, type,
-                        handleAddOrderItem, handleChangeOrderItem, handleRemoveOrderItem}:EditOrderModalProps) => {
+                        handleAddOrderItem, handleChangeOrderItem, handleRemoveOrderItem,
+                        handleCancel, handleFinish}:EditOrderModalProps) => {
     
     const [itemNamePattern, setItemNamePattern] = useState("");
-    const itemNamePatternChangedHandler = useCallback((text:string)=>{
-        setItemNamePattern(text);
-    }, []);
-    const [itemNameSuggestions, setItemNameSuggestions] = useState([] as string[]);
-    const [currents, setCurrents] = useState([] as string[]);
-    const [steelTypes, setSteelTypes] = useState([] as string[]);
     const [current, setCurrent] = useState(null as string|null);    
     const [steelType, setSteelType] = useState(null as string|null);
-    const [isOriginal, setOriginal] = useState(true as boolean);
+    const [isOriginal, setOriginal] = useState(null as boolean|null);
 
-    const [isItemNameValid, setItemNameValid] = useState(false);
-    const [isCurrentValid, setCurrentValid] = useState(false);
-    const [isSteelTypeValid, setSteelTypeValid] = useState(false);
+    const [itemCandidates, setItemCandidates] = useState([] as Item[]);
     const [canAdd, setCanAdd] = useState(false);
-    const [itemToAdd, setItemToAdd] = useState(null as Item|null);
 
-    useEffect(()=>{
-        const valid = current !== null && currents.includes(current);
-        setCurrentValid(valid);
-    }, [current, currents]);
-    useEffect(()=>{
-        const valid = steelType !== null && steelTypes.includes(steelType);
-        setSteelTypeValid(valid);
-    }, [steelType, steelTypes]);
+    const [isLoading, setLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState(null as string|null);
 
-    useEffect(()=>{
-        const valid = isCurrentValid && isItemNameValid && isSteelTypeValid;
-        setCanAdd(valid);
-    }, [isCurrentValid, isItemNameValid, isSteelTypeValid]);
-
-    useEffect(()=>{
-        const fetchItemToAdd = async ()=>{
-            if(canAdd){
-                const items = await getItems({
-                    current: parseInt(current as string),
-                    isOriginal: isOriginal,
-                    pattern: itemNamePattern,
-                    steelType: steelType as string
-                });
-                if(items.length !== 1)  return;
-                const item = items[0];
-                setItemToAdd(item);
-            }
-            else{
-                setItemToAdd(null);
-            }
-        };
-        fetchItemToAdd();
-    }, [canAdd, current, isOriginal, itemNamePattern, steelType]);
+    const addBtnRef = useRef(null);
 
     useEffect(()=>{
         let isNewest = true;
-        const updateSuggestions = async ()=>{
-            if(show){
-                const itemNames = await searchItemNames(itemNamePattern);
-                if(!isNewest)
-                    return;
-                if(itemNames.length === 1 
-                            && itemNames[0] === itemNamePattern){
-                    setItemNameValid(true);
-                    setItemNameSuggestions([]);
-                }
-                else{
-                    setItemNameSuggestions(itemNames);
-                    setItemNameValid(false);
-                }
-            }
-        }
-        updateSuggestions();
+        
+        safeFetch(async ()=>{
+            const candidates = await getItems({
+                current: parseInt(current as string) || undefined,
+                isOriginal: isOriginal ?? undefined,
+                pattern: itemNamePattern,
+                steelType: steelType as string
+            });
+            if(isNewest)
+                setItemCandidates(candidates);
+        }, setErrorMsg, setLoading)
         return ()=>{
             isNewest = false;
         }
-    }, [itemNamePattern, show]);
-    useEffect(()=>{
-        let isNewest = true;
-        const updateItemTemplate = async ()=>{
-            if(isItemNameValid){
-                const itemTemplates = (await getItemTemplates(itemNamePattern));
-                if(!isNewest || itemTemplates.length !== 1 || itemTemplates[0].name !== itemNamePattern)
-                    return;
-                const itemTemplate = itemTemplates[0];
-                setItemNamePattern(itemTemplate.name);
-                setCurrents(itemTemplate.currents.map(a=>a.toString()));
-                setSteelTypes(itemTemplate.steelTypes);
-            }
-            else{
-                setCurrents([]);
-                setSteelTypes([]);
-                setCurrent("");
-                setSteelType("");
-            }
-        };
-        updateItemTemplate();
-        return ()=>{
-            isNewest = false;
-        }
-    }, [itemNamePattern, isItemNameValid]);
+    }, [itemNamePattern, current, steelType, isOriginal]);
 
     const changeAmountHandler = useCallback((orderItem: OrderItem, amount: number)=>{
         const changedOrderItem = {
@@ -137,10 +73,10 @@ const EditOrderModal = ({show, handleClose, handleSave, order, type,
     const addHandler = useCallback(()=>{
         const newOrderItem = {
             amountDelta: 1,
-            item:itemToAdd
+            item:itemCandidates[0]
         } as OrderItem;
         handleAddOrderItem(newOrderItem);
-    }, [itemToAdd, handleAddOrderItem]);
+    }, [itemCandidates, handleAddOrderItem]);
 
     return ( 
       <Fragment>
@@ -153,68 +89,78 @@ const EditOrderModal = ({show, handleClose, handleSave, order, type,
                 type === 'creating' ? 
                 'Tworzenie nowego zamówienia' 
                 :
-                `${order.id} - edycja`}
+                `Edycja zamówienia nr ${order.id}`}
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
+            {errorMsg ? (
+                <Alert variant="danger">
+                    {errorMsg}
+                </Alert>
+            ) : null}
             <div className="mb-3" style={{
                         display: 'flex',
                         flexDirection: 'row',
-                        alignItems: 'self-start',
+                        justifyContent:'space-between',
                         columnGap: 5
                     }}>
-                <SearchInput placeholder="Wybierz nazwę towaru"
-                            handleTextChange={itemNamePatternChangedHandler}
-                            isValid={isItemNameValid}
-                            text={itemNamePattern}
-                            suggestions={itemNameSuggestions}
-                            style={{
-                                flexShrink: 0.3,
-                                flexBasis: 400
-                            }}
-                            />
-                <FormSelect isValid={isSteelTypeValid}
-                            onChange={e=>setSteelType(e.currentTarget.value)}>
-                    <option>Wybierz materiał</option>
-                    {steelTypes.map(steelType=>(
-                        <option value={steelType} key={steelType}>
-                            {steelType}
-                        </option>
-                    ))}
-                </FormSelect>
-
-                <FormSelect isValid={isCurrentValid}
-                            onChange={e=>setCurrent(e.currentTarget.value)}>
-                    <option>Wybierz prąd</option>
-                    {currents.map(current=>(
-                        <option value={current} key={current}>
-                            {current}A
-                        </option>
-                    ))}
-                </FormSelect>
-                <ToggleButton toggled={isOriginal}
-                              changeToggle={(toggled)=> setOriginal(toggled)} 
-                              textToggled="Oryginał"
-                              textUntoggled="Zamiennik"
-                              variantToggled="success"
-                              variantUntoggled="warning"
-                              />
+                <div style={{
+                    flexGrow: 1
+                }}>
+                    <ItemsFilter current={current}
+                                handleCurrentChange={setCurrent}
+                                steelType={steelType}
+                                handleSteelChange={setSteelType}
+                                namePattern={itemNamePattern}
+                                handleNamePatternChange={setItemNamePattern}
+                                isOriginal={isOriginal}
+                                handleIsOriginalChange={setOriginal}
+                                isEverythingChoosen={canAdd}
+                                handleIsEverythingChoosenChange={setCanAdd}
+                                itemCandidates={itemCandidates}
+                    />
+                </div>
                 <AddButton onClick={addHandler}
                             disabled={!canAdd}
                             style={{
-                                flexShrink: 0,
-                                margin: "auto",
-                                marginTop: 0
-                            }} />
+                                alignSelf: 'start',
+                                flexShrink: 0
+                            }} 
+                            ref={addBtnRef} />
+                <Overlay target={addBtnRef.current} show={canAdd} placement="bottom-end" >
+                    {({ placement, arrowProps, show: _show, popper, ...props }) => (
+                    <Popover {...props} placement={placement}>
+                        Na stanie: {itemCandidates[0] && itemCandidates[0].amount}
+                    </Popover>
+                    )}
+                </Overlay>
             </div>
             <div className="mt-4"></div>
             <OrderItemList handleChangeAmount={changeAmountHandler} 
                             handleDelete={deleteOrderItemHandler}
-                            orderItems={order.orderItems} />
+                            orderItems={order.orderItems} type='edit' />
+
+            {isLoading ? <Spinner /> : null}
           </Modal.Body>
           <Modal.Footer>
+            {type === 'editing' ? (
+                <Fragment>
+                    <Button variant="danger" onClick={handleCancel}>
+                        <Trash style={{
+                                    marginRight: 6
+                                }}/>
+                        Anuluj zamówienie
+                    </Button>
+                    <Button variant='warning' onClick={handleFinish}>
+                        <Toggles style={{
+                                marginRight: 6
+                            }}/>
+                        Oznacz jako zrealizowane
+                    </Button>
+                </Fragment>
+            ):null}
+            <SaveButton onClick={handleSave}>{type==='editing' ? 'Aktualizuj' : "Zapisz"}</SaveButton>
             <CloseButton onClick={handleClose} />
-            <SaveButton onClick={handleSave} />
           </Modal.Footer>
         </Modal>
       </Fragment>

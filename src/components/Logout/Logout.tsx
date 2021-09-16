@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Redirect } from "react-router-dom";
-import { AuthActions } from "../../store/authStore";
+import { AuthActions } from "../../store/authActions";
 import { useDispatchTyped } from "../../store/helperHooks";
 
 const Logout = (props:any)=>{

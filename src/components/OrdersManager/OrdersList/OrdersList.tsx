@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Button, Table } from 'react-bootstrap';
+import { Table } from 'react-bootstrap';
 import { Order } from '../../../api/centrostalApi';
 import { EditButton, ShowButton } from '../../UI/ImageButtons/ImageButtons';
 

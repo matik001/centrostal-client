@@ -1,11 +1,11 @@
 import React from "react";
 import { useState } from "react"
 import { useDispatchTyped, useSelectorTyped } from "../../store/helperHooks";
-import { AuthActions } from "../../store/authStore";
 import { Alert, Button, Form } from "react-bootstrap";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Card from "react-bootstrap/Card";
 import Spinner from "../UI/Spinner/Spinner";
+import { AuthActions } from "../../store/authActions";
 
 export interface LoginFormProps {
 

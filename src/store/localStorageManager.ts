@@ -11,7 +11,10 @@ export const setStr = (key:LocalStorageItemName, value:string)=>localStorage.set
 export const getDate = (key:LocalStorageItemName) => {
     if(key == null)
         return null;
-    return new Date(localStorage.getItem(key) as string);
+    const val = localStorage.getItem(key);
+    if(val == null)
+        return null;
+    return new Date(parseInt(val));
 }
 
 export const setDate = (key:LocalStorageItemName, value:Date)=>{

@@ -1,5 +1,5 @@
 
-import { Fragment, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { Search } from "react-bootstrap-icons";
 import FormControl, { FormControlProps } from "react-bootstrap/FormControl";
 import InputGroup from "react-bootstrap/InputGroup";
@@ -29,7 +29,7 @@ const SearchInput = ({text,
     }, [setFocused])
     return(
         <div style={style}>
-            <InputGroup hasValidation style={{width: "100%"}}>
+            <InputGroup hasValidation style={{width: "100%", flexWrap: 'nowrap'}}>
                 <InputGroup.Text style={{width: 40}}>
                     <Search />
                 </InputGroup.Text>

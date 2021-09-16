@@ -1,6 +1,7 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import thunk from 'redux-thunk'
-import { AuthAction, authReducer, AuthState } from './authStore';
+import { AuthAction } from './authActions';
+import { authReducer, AuthState } from './authStore';
 
 
 export interface ApplicationState {
