@@ -7,6 +7,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { Provider } from 'react-redux';
 import combinedStore from './store';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { BrowserRouter, HashRouter } from 'react-router-dom';
 
 const store = combinedStore;
 
@@ -14,7 +15,9 @@ ReactDOM.render(
   <React.StrictMode>
     <HelmetProvider>
       <Provider store={store}>
-        <App />
+        <HashRouter>
+          <App />
+        </HashRouter>
       </Provider>
     </HelmetProvider>
   </React.StrictMode>,

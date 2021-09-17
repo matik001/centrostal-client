@@ -4,6 +4,9 @@ import * as centrostalApi from '../api/centrostalApi'
 import * as  localStorageManager from './localStorageManager'
 import { LocalStorageItemName } from "./localStorageManager";
 
+export interface ClearRedirectAction {
+    type: 'AUTH_CLEAR_REDIRECT';
+}
 export interface LogoutAction {
     type: 'AUTH_LOGOUT';
 }
@@ -15,13 +18,14 @@ export interface LoginSucessfulAction{
     token: string;
     userId: string;
     isAdmin: boolean;
+    redirectPath?: string;
 }
 export interface LoginError{
     type: "AUTH_ERROR";
     error: string;
 }
 
-export type AuthAction = LogoutAction | LoginStartedAction | LoginSucessfulAction | LoginError;
+export type AuthAction = LogoutAction | LoginStartedAction | LoginSucessfulAction | LoginError | ClearRedirectAction;
 
 export const AuthActions = {
     login: (email:string, password:string ) : AppThunkAction<AuthAction> => async (dispatch, getState)=>{
@@ -66,7 +70,7 @@ export const AuthActions = {
             type: "AUTH_LOGOUT"
         }
     },
-    autoLogin: ():AppThunkAction<AuthAction> => async(dispatch, getState)=>{
+    autoLogin: (redirectPath?:string):AppThunkAction<AuthAction> => async(dispatch, getState)=>{
         const token = localStorageManager.getStr(LocalStorageItemName.TOKEN)
         const userId = localStorageManager.getStr(LocalStorageItemName.USER_ID)
         const expiration = localStorageManager.getDate(LocalStorageItemName.EXPIRATION_TIME)
@@ -76,7 +80,10 @@ export const AuthActions = {
             dispatch(AuthActions.logout());
             return;
         }
-        dispatch({type:"AUTH_SUCESSFUL", token, userId, isAdmin});
+        dispatch({type:"AUTH_SUCESSFUL", token, userId, isAdmin, redirectPath: redirectPath});
+    },
+    clearRedirect: ():AppThunkAction<AuthAction> => async(dispatch, getState)=>{
+        dispatch({type: "AUTH_CLEAR_REDIRECT"} as ClearRedirectAction);
     }
 };
 

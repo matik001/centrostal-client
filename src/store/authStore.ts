@@ -8,7 +8,7 @@ export interface AuthState {
     userId: string | null,
     isAdmin: boolean,
     error: string | null,
-    redirectPath: string | null
+    redirectPath?: string
 }
 
 
@@ -22,7 +22,7 @@ const initialState = {
     token: null,
     userId: null,
     error: null,
-    redirectPath: null,
+    redirectPath: undefined,
     isAdmin: false
 };
 
@@ -37,7 +37,9 @@ if (state === undefined) {
             break;
 
         case 'AUTH_STARTED':
-            res = initialState;
+            res = {
+                ...initialState,
+            };
             break;
         case 'AUTH_SUCESSFUL':{
             const actionData = (action as LoginSucessfulAction);
@@ -45,7 +47,7 @@ if (state === undefined) {
                 token: actionData.token,
                 userId: actionData.userId,
                 error: null,
-                redirectPath: null,
+                redirectPath: actionData.redirectPath,
                 isAdmin: actionData.isAdmin
             }
             break;
@@ -56,11 +58,16 @@ if (state === undefined) {
                 token: null,
                 userId: null,
                 error: actionData.error,
-                redirectPath: "/login",
+                redirectPath: undefined,
                 isAdmin: false
             }
             break;
         }
+        case 'AUTH_CLEAR_REDIRECT':
+            res = {
+                ...res,
+                redirectPath: undefined
+            }
     }
 
     return res;
