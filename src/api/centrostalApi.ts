@@ -2,7 +2,7 @@ import axios from 'axios'
 import combinedStore from '../store';
 import * as localStorageManager from '../store/localStorageManager'
 
-const BASE_URL = 'https://localhost:44322';
+const BASE_URL = process.env.REACT_APP_API_PATH;
 
 const centrostalApiAxios = axios.create({
     baseURL: BASE_URL,
@@ -16,7 +16,7 @@ centrostalApiAxios.interceptors.response.use(response => {
         type: 'AUTH_LOGOUT'
     });
    }
-   return error;
+   throw error;
  });
 
 const getAuthConfig = ()=>{
@@ -44,7 +44,8 @@ export const login = async (email:string, password:string)=>{
             username: email,
             password: password
         })).data;
-    data.expirationTime = new Date(data.expirationTime);
+    if(data)
+        data.expirationTime = new Date(data?.expirationTime);
     return data as LoginResponseData;
 };
 

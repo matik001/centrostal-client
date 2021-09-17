@@ -70,31 +70,6 @@ const LoginForm = (props: LoginFormProps) => {
             </Card>
         </>
     )
-    // const [isLoading, setIsLoading] = useState(false);
-    // const serverErrors = useSelectorTyped(state=>state.auth?.error)
-    // const redirectPath = useSelectorTyped(state=>state.auth?.redirectPath)
-
-    // const { register, handleSubmit, watch, formState: { errors } } = useForm<FormData>({
-    //     resolver: yupResolver(schema)
-    // });
-    // const dispatch = useDispatch();
-    // const onSubmit = async (data:FormData)=>{
-    //     setIsLoading(true)
-    //     await dispatch(AuthActions.login(data.email, data.password))
-    //     setIsLoading(false)
-    // }
-
-    // console.log(errors);
-    // return (
-    //     <form onSubmit={handleSubmit(onSubmit)} className={style.form}>
-    //         <TextInput name="email" register={register}  label="Email" placeholder="Enter email" errors={errors} /> 
-    //         <TextInput name="password" register={register}  label="Password" placeholder="Enter password" errors={errors} password /> 
-
-    //         <button type="submit" className={style.submitBtn}>Login</button>
-    //         {serverErrors ? <h5 style={{color:'red'}}>{serverErrors}</h5> : null}
-    //         {isLoading? <Spinner /> :null}
-    //     </form>
-    // ) 
 }
 
 export default LoginForm;
