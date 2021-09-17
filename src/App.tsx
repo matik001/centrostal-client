@@ -27,12 +27,12 @@ function App() {
       <Layout isAuthenticated={isAuthenticated}
               isAdmin={isAdmin}>
         <Switch>
-            {didAutologin && !isAuthenticated ? <Redirect to="/login" /> :null}
             {didAutologin && isAuthenticated ? <Redirect from="/login" to="/" /> :null} 
+            <Route path="/login"  component={LoginForm} /> 
+            {didAutologin && !isAuthenticated ? <Redirect to="/login" /> :null}
             <Route path="/items" component={ItemsViewer} />
             <Route path="/orders" component={OrdersManager} />
             <Route path="/logout" component={Logout} />
-            <Route path="/login"  component={LoginForm} /> 
             <Route path="/" exact component={ItemsViewer} /> 
         </Switch>
       </Layout>
