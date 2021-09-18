@@ -19,6 +19,7 @@ export interface EditOrderModalProps{
   handleFinish: ()=>void;
   order: Order;
   type: 'creating'|'editing';
+  isSupply: boolean;
   handleAddOrderItem: (orderItem:OrderItem)=>void;
   handleChangeOrderItem: (orderItem:OrderItem)=>void;
   handleRemoveOrderItem: (orderItem:OrderItem)=>void;
@@ -26,7 +27,7 @@ export interface EditOrderModalProps{
 
 const EditOrderModal = ({show, handleClose, handleSave, order, type,
                         handleAddOrderItem, handleChangeOrderItem, handleRemoveOrderItem,
-                        handleCancel, handleFinish}:EditOrderModalProps) => {
+                        handleCancel, handleFinish, isSupply}:EditOrderModalProps) => {
     
     const [itemNamePattern, setItemNamePattern] = useState("");
     const [current, setCurrent] = useState(null as string|null);    
@@ -93,9 +94,9 @@ const EditOrderModal = ({show, handleClose, handleSave, order, type,
           <Modal.Header>
             <Modal.Title>{
                 type === 'creating' ? 
-                'Tworzenie nowego zamówienia' 
+                (isSupply ? 'Nowa dostawa' : 'Nowe zamówienie') 
                 :
-                `Edycja zamówienia nr ${order.id}`}
+                (isSupply?`Edycja dostawy nr ${order.id}`:`Edycja zamówienia nr ${order.id}`)}
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
@@ -144,7 +145,9 @@ const EditOrderModal = ({show, handleClose, handleSave, order, type,
             <div className="mt-4"></div>
             <OrderItemList handleChangeAmount={changeAmountHandler} 
                             handleDelete={deleteOrderItemHandler}
-                            orderItems={order.orderItems} type='edit' />
+                            orderItems={order.orderItems} 
+                            type='edit'
+                            isSupply={isSupply} />
 
             {isLoading ? <Spinner /> : null}
           </Modal.Body>
@@ -155,13 +158,13 @@ const EditOrderModal = ({show, handleClose, handleSave, order, type,
                         <Trash style={{
                                     marginRight: 6
                                 }}/>
-                        Anuluj zamówienie
+                        Anuluj
                     </Button>
                     <Button variant='warning' onClick={handleFinish}>
                         <Toggles style={{
                                 marginRight: 6
                             }}/>
-                        Oznacz jako zrealizowane
+                        Zrealizuj
                     </Button>
                 </Fragment>
             ):null}

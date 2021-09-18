@@ -30,8 +30,14 @@ function App() {
             {didAutologin && isAuthenticated ? <Redirect from="/login" to="/" /> :null} 
             <Route path="/login"  component={LoginForm} /> 
             {didAutologin && !isAuthenticated ? <Redirect to="/login" /> :null}
+           
+            <Route path="/orders" render={()=>
+              <OrdersManager isSupply={false} />} />
+              
+            <Route path="/supplies" render={()=>
+              <OrdersManager isSupply={true} />} />
+
             <Route path="/items" component={ItemsViewer} />
-            <Route path="/orders" component={OrdersManager} />
             <Route path="/logout" component={Logout} />
             <Route path="/" exact component={ItemsViewer} /> 
         </Switch>

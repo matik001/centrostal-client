@@ -9,23 +9,26 @@ import OrdersList from './OrdersList/OrdersList';
 import ViewOrderModal from './ViewOrderModal/ViewOrderModal';
 
 export interface OrdersManagerProps{
+    isSupply: boolean;
 }
 
-const OrdersManager = ({}:OrdersManagerProps)=>{
+const OrdersManager = ({isSupply}:OrdersManagerProps)=>{
 
     const [orders, setOrders] = useState([] as Order[]);
     const [isLoading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState(null as string|null);
     
-    const createNewOrder = ()=>{
+    const createNewOrder = useCallback(()=>{
         return {
             id: 0,
             createdDate: new Date(),
             orderingPerson: "",
             status: "zlecone",
-            orderItems: []
+            orderItems: [],
+            isSupply: isSupply
         } as Order;
-    }
+    },[isSupply]);
+
     const [editingOrder, setEditingOrder] = useState(createNewOrder());
     const [editingType, setEditingType] = useState('creating' as 'editing' | 'creating');
     const [isEditing, setIsEditing] = useState(false);
@@ -33,12 +36,16 @@ const OrdersManager = ({}:OrdersManagerProps)=>{
     const [isViewingOrder, setIsViewingOrder] = useState(false);
     const [viewingOrder, setViewingOrder] = useState(null as Order|null);
 
+    useEffect(()=>{
+        setEditingOrder(createNewOrder());
+    },[isSupply, createNewOrder]);
+
     const refreshOrders = useCallback(async ()=>{
         safeFetch(async ()=>{
-            const newOrders = await getOrders();
+            const newOrders = await getOrders(isSupply);
             setOrders(newOrders);
         }, setErrorMsg, setLoading);
-    }, []);
+    }, [isSupply]);
 
     
     useEffect(()=>{
@@ -49,7 +56,7 @@ const OrdersManager = ({}:OrdersManagerProps)=>{
         setIsEditing(false);
         if(editingType === 'editing')
             setEditingOrder(createNewOrder());
-    }, [editingType]);
+    }, [editingType, createNewOrder]);
 
     const startCreatingHandler = useCallback(()=>{
         setIsEditing(true);
@@ -73,7 +80,7 @@ const OrdersManager = ({}:OrdersManagerProps)=>{
         
         await refreshOrders();
         setEditingOrder(createNewOrder());
-    }, [editingOrder, editingType, refreshOrders]);
+    }, [editingOrder, editingType, refreshOrders, createNewOrder]);
 
     const cancelOrderEditingHandler = useCallback(async ()=>{
         await updateOrder(editingOrder.id, orderToCreateOrder(editingOrder));
@@ -83,7 +90,7 @@ const OrdersManager = ({}:OrdersManagerProps)=>{
         setEditingOrder(createNewOrder());
 
 
-    }, [editingOrder, refreshOrders]);
+    }, [editingOrder, refreshOrders, createNewOrder]);
 
     const finishOrderEditingHandler = useCallback(async ()=>{
         await updateOrder(editingOrder.id, orderToCreateOrder(editingOrder));
@@ -92,7 +99,7 @@ const OrdersManager = ({}:OrdersManagerProps)=>{
         await refreshOrders();
         setEditingOrder(createNewOrder());
 
-    }, [editingOrder, refreshOrders]);
+    }, [editingOrder, refreshOrders, createNewOrder]);
 
 
     const addOrderItemHandler = useCallback((orderItem:OrderItem)=>{
@@ -167,7 +174,7 @@ const OrdersManager = ({}:OrdersManagerProps)=>{
                                 <EditOrderModal show={isEditing} type={editingType} handleClose={closeEditingHandler}
                                     handleSave={saveEditingHandler} order={editingOrder} handleAddOrderItem={addOrderItemHandler}
                                     handleChangeOrderItem={changeOrderItemHandler} handleRemoveOrderItem={removeOrderItemHandler}
-                                    handleCancel={cancelOrderEditingHandler} handleFinish={finishOrderEditingHandler}
+                                    handleCancel={cancelOrderEditingHandler} handleFinish={finishOrderEditingHandler} isSupply={isSupply}
                                      />
                             ) : null}
                             {isViewingOrder ? (

@@ -157,7 +157,7 @@ const ItemsFilter = ({current, handleCurrentChange, handleIsOriginalChange, hand
                                     flex: 0.4, 
                                 }}>
                         {amountOptions.map(filter => (
-                            <option value={filter}>{filter}</option>
+                            <option key={filter} value={filter}>{filter}</option>
                         ))}
                     </FormSelect>
                 ) : null}

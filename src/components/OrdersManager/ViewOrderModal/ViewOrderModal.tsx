@@ -22,7 +22,7 @@ const ViewOrderModal = ({show, handleClose, order}:ViewOrderModalProps)=>{
               </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <OrderItemList orderItems={order.orderItems} type='noedit' />
+              <OrderItemList orderItems={order.orderItems} type='noedit' isSupply={order.isSupply} />
             </Modal.Body>
             {/* <Modal.Footer>
               <SaveButton onClick={handleSave}>{type==='editing' ? 'Aktualizuj' : "Zapisz"}</SaveButton>

@@ -19,7 +19,7 @@ const ItemsViewer = ({}:ItemsViewerProps)=>{
     const [current, setCurrent] = useState(null as string|null);    
     const [steelType, setSteelType] = useState(null as string|null);
     const [isOriginal, setOriginal] = useState(null as boolean|null);
-    const [amountFilter, setAmountFilter] = useState(AmountFilter.all);
+    const [amountFilter, setAmountFilter] = useState(AmountFilter.nonZero);
     const [refresh, setRefresh] = useState(false);
 
     useEffect(()=>{

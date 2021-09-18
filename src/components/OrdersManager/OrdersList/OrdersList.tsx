@@ -38,8 +38,8 @@ const OrdersList = ({orders, handleViewOrder, handleEditOrder}:OrdersListProps)=
                                     <td style={{
                                         fontWeight: 'bold',
                                         color: order.status==='zlecone' ? '#ffc107'
-                                            :  order.status==='zrealizowane' ? '#198754'
-                                            :  '#dc3546'
+                                            :  order.status==='anulowane' ? '#dc3546'
+                                            :  '#198754'
                                     }}>{order.status}</td>
                                     <td>
                                         <ShowButton onClick={()=>handleViewOrder(order)} />

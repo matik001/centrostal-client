@@ -133,7 +133,8 @@ export interface Order{
     createdDate: Date;
     lastEditedDate?: Date;
     executedDate?: Date;
-    status:"zlecone"|"zrealizowane"|"anulowane";
+    status:"zlecone"|"zrealizowane"|"odebrane"|"anulowane";
+    isSupply: boolean;
     orderingPerson:string;
     orderItems:OrderItem[];
 }
@@ -145,8 +146,13 @@ const orderDtoToOrder = (elem:any)=>{
         elem.executedDate = new Date(elem.executedDate);
     return elem as Order;
 };
-export const getOrders = async ()=>{    
-    const res = (await centrostalApiAxios.get("/order", getAuthConfig())).data;
+export const getOrders = async (isSupply?:boolean)=>{    
+    const res = (await centrostalApiAxios.get("/order", {
+        ...getAuthConfig(),
+        params: {
+            isSupply: isSupply
+        }
+    })).data;
     const orders = res.map((x:any)=>orderDtoToOrder(x));
         return orders as Order[];
 }
@@ -157,6 +163,7 @@ export interface CreateOrderItem{
     itemId: number;
 }
 export interface CreateOrder{
+    isSupply: boolean;
     orderItems: CreateOrderItem[];
 }
 

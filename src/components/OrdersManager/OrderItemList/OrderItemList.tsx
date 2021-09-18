@@ -6,10 +6,11 @@ export interface OrderItemListProps{
     orderItems:OrderItem[];
     handleChangeAmount?: (orderItem:OrderItem, amount:number)=>void;
     handleDelete?: (orderItem:OrderItem)=>void;
+    isSupply: boolean;
     type: 'edit' | 'noedit';
 }
 
-const OrderItemList = ({orderItems,handleChangeAmount, handleDelete, type }:OrderItemListProps)=>{
+const OrderItemList = ({orderItems,handleChangeAmount, handleDelete, type, isSupply }:OrderItemListProps)=>{
     return  (
         <Fragment>
             <Table striped bordered hover variant="dark">
@@ -34,44 +35,45 @@ const OrderItemList = ({orderItems,handleChangeAmount, handleDelete, type }:Orde
                     </tr>
                 </thead>
                 <tbody>
-                    {orderItems.map(orderItem=>(
-                        <tr key={orderItem.item.id}>
-                            <td>{orderItem.item.id}</td>
-                            <td>{orderItem.item.name}</td>
-                            <td>{orderItem.item.number}</td>
-                            <td>{orderItem.item.isOriginal ? "Oryginał" : "Zamiennik"}</td>
-                            <td>{orderItem.item.steelType}</td>
-                            <td>{orderItem.item.current}A</td>
-                            {(type === 'edit' ? (
-                                <td style={{
-                                        color: (orderItem.item.amount + orderItem.amountDelta >= 0  ? '#25ba75' : '#dc3546'),
+                    {orderItems.map(orderItem=>{
+                        const newAmount = orderItem.item.amount + (isSupply ? orderItem.amountDelta : -orderItem.amountDelta);
+                        return (
+                            <tr key={orderItem.item.id}>
+                                <td>{orderItem.item.id}</td>
+                                <td>{orderItem.item.name}</td>
+                                <td>{orderItem.item.number}</td>
+                                <td>{orderItem.item.isOriginal ? "Oryginał" : "Zamiennik"}</td>
+                                <td>{orderItem.item.steelType}</td>
+                                <td>{orderItem.item.current}A</td>
+                                {type === 'edit' ? (
+                                    <Fragment>
+                                        
+                                        <td style={{
+                                                color: (newAmount >= 0 ? '#25ba75' : '#dc3546'),
+                                                fontWeight: 'bold'
+                                        }}>
+                                            {orderItem.item.amount} ({isSupply ? '+' : '-'}{orderItem.amountDelta})
+                                        </td>
+                                        <td>
+                                            <FormControl type="number" min={1}
+                                                        value={orderItem.amountDelta.toString()} 
+                                                        onChange={(e)=>handleChangeAmount!(orderItem, parseInt(e.currentTarget.value) || 0)} />
+                                        </td>
+                                        <td>
+                                            <Button variant="danger"
+                                                    onClick={()=>handleDelete!(orderItem)}>
+                                                Usuń
+                                            </Button>
+                                        </td>
+                                    </Fragment>
+                                ): 
+                                    <td style={{
+                                        color: (isSupply ? '#25ba75' : '#dc3546'),
                                         fontWeight: 'bold'
-                                }}>
-                                    {orderItem.item.amount}
-                                </td>
-                            ) : null)}
-                            {type === 'edit' ? (
-                                <Fragment>
-                                    <td>
-                                        <FormControl type="number"
-                                                    value={orderItem.amountDelta.toString()} 
-                                                    onChange={(e)=>handleChangeAmount!(orderItem, parseInt(e.currentTarget.value) || 0)} />
-                                    </td>
-                                    <td>
-                                        <Button variant="danger"
-                                                onClick={()=>handleDelete!(orderItem)}>
-                                            Usuń
-                                        </Button>
-                                    </td>
-                                </Fragment>
-                            ): 
-                                <td style={{
-                                    color: (orderItem.amountDelta>=0 ? '#25ba75' : '#dc3546'),
-                                    fontWeight: 'bold'
-                                }}>{orderItem.amountDelta>0 ? '+' : ''}{orderItem.amountDelta}</td>
-                            }
-                        </tr>
-                    ))}
+                                    }}>{isSupply ? '+' : '-'}{orderItem.amountDelta}</td>
+                                }
+                            </tr>
+                    )})}
                 </tbody>
             </Table>
                   
