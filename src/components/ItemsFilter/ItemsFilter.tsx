@@ -1,8 +1,16 @@
+import { useMemo } from "react";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { FormSelect } from "react-bootstrap";
 import { Item } from "../../api/centrostalApi";
 import SearchInput from "../UI/Input/SearchInput/SearchInput";
 
+
+export enum AmountFilter{
+    all = "Wybierz ilość",
+    nonZero = "Niezerowa",
+    positive = "Dodatnia",
+    negative = "Ujemna"
+}
 export interface ItemsFilterProps{
     namePattern: string;
     handleNamePatternChange: (namePattern:string)=>void;
@@ -19,13 +27,16 @@ export interface ItemsFilterProps{
     isEverythingChoosen?: boolean;
     handleIsEverythingChoosenChange?: (val:boolean)=>void;
     
+    amountFilter?: AmountFilter;
+    handleAmountFilterChange?: (filter:AmountFilter)=>void;
+
     itemCandidates: Item[];
 }
 
 
 const ItemsFilter = ({current, handleCurrentChange, handleIsOriginalChange, handleSteelChange,
                         isOriginal, steelType, itemCandidates, handleNamePatternChange, namePattern,
-                    handleIsEverythingChoosenChange, isEverythingChoosen}:ItemsFilterProps)=>{
+                    handleIsEverythingChoosenChange, isEverythingChoosen, amountFilter, handleAmountFilterChange}:ItemsFilterProps)=>{
     
 
     const [names, setNames] = useState([] as string[]);
@@ -36,6 +47,7 @@ const ItemsFilter = ({current, handleCurrentChange, handleIsOriginalChange, hand
     const [isCurrentValid, setCurrentValid] = useState(false);
     const [isSteelTypeValid, setSteelTypeValid] = useState(false);
 
+    const amountOptions = useMemo(()=>[AmountFilter.all, AmountFilter.nonZero, AmountFilter.positive, AmountFilter.negative], []);
 
     useEffect(()=>{
         const newNameSuggestions = [...new Set(itemCandidates.map(item=>item.name))];
@@ -70,7 +82,7 @@ const ItemsFilter = ({current, handleCurrentChange, handleIsOriginalChange, hand
     
 
     useEffect(()=>{
-        const valid = isCurrentValid && isItemNameValid && isSteelTypeValid && itemCandidates.length === 1;
+        const valid = isCurrentValid && isItemNameValid && isSteelTypeValid && itemCandidates.length >= 1;
         handleIsEverythingChoosenChange?.call(null, valid);
     }, [isCurrentValid, isItemNameValid, isSteelTypeValid, itemCandidates, handleIsEverythingChoosenChange]);
 
@@ -137,6 +149,19 @@ const ItemsFilter = ({current, handleCurrentChange, handleIsOriginalChange, hand
                     <option value="original">Oryginał</option>
                     <option value="substitute">Zamiennik</option>
                 </FormSelect>
+                {amountFilter ? (
+                    <FormSelect isValid={amountFilter !== AmountFilter.all}
+                                onChange={e=>handleAmountFilterChange && handleAmountFilterChange(e.currentTarget.value as AmountFilter)}
+                                value={amountFilter}
+                                style={{
+                                    flex: 0.4, 
+                                }}>
+                        {amountOptions.map(filter => (
+                            <option value={filter}>{filter}</option>
+                        ))}
+                    </FormSelect>
+                ) : null}
+                
             </div>
         </Fragment>
     );

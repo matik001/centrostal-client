@@ -71,12 +71,18 @@ const EditOrderModal = ({show, handleClose, handleSave, order, type,
     }, [handleRemoveOrderItem]);
 
     const addHandler = useCallback(()=>{
+        const exactNameItems = itemCandidates.filter(a=>a.name.toLowerCase() === itemNamePattern.toLowerCase());
+        const itemToAdd = exactNameItems[0] ?? itemCandidates[0];
         const newOrderItem = {
             amountDelta: 1,
-            item:itemCandidates[0]
+            item:itemToAdd
         } as OrderItem;
         handleAddOrderItem(newOrderItem);
-    }, [itemCandidates, handleAddOrderItem]);
+        setItemNamePattern('');
+        setSteelType(null);
+        setCurrent(null);
+        setOriginal(null);
+    }, [itemCandidates, handleAddOrderItem, itemNamePattern]);
 
     return ( 
       <Fragment>

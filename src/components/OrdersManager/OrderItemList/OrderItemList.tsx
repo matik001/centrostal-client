@@ -21,7 +21,9 @@ const OrderItemList = ({orderItems,handleChangeAmount, handleDelete, type }:Orde
                         <th>Oryginał</th>
                         <th>Rodzaj stali</th>
                         <th>Prąd</th>
-                        <th>Na stanie</th>
+                        {type==='edit' ? (
+                            <th>Na stanie</th>
+                        ):null}
                         <th style={{
                             width: 100}}>
                                 Zmiana
@@ -40,12 +42,14 @@ const OrderItemList = ({orderItems,handleChangeAmount, handleDelete, type }:Orde
                             <td>{orderItem.item.isOriginal ? "Oryginał" : "Zamiennik"}</td>
                             <td>{orderItem.item.steelType}</td>
                             <td>{orderItem.item.current}A</td>
-                            <td style={{
-                                    color: (orderItem.item.amount + orderItem.amountDelta >= 0  ? '#25ba75' : '#dc3546'),
-                                    fontWeight: 'bold'
-                            }}>
-                                {orderItem.item.amount}
-                            </td>
+                            {(type === 'edit' ? (
+                                <td style={{
+                                        color: (orderItem.item.amount + orderItem.amountDelta >= 0  ? '#25ba75' : '#dc3546'),
+                                        fontWeight: 'bold'
+                                }}>
+                                    {orderItem.item.amount}
+                                </td>
+                            ) : null)}
                             {type === 'edit' ? (
                                 <Fragment>
                                     <td>
