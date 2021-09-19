@@ -94,9 +94,9 @@ const EditOrderModal = ({show, handleClose, handleSave, order, type,
           <Modal.Header>
             <Modal.Title>{
                 type === 'creating' ? 
-                (isSupply ? 'Nowa dostawa' : 'Nowe zamówienie') 
+                (isSupply ? 'Nowa dostawa' : 'Nowe wydanie') 
                 :
-                (isSupply?`Edycja dostawy nr ${order.id}`:`Edycja zamówienia nr ${order.id}`)}
+                (isSupply?`Edycja dostawy nr ${order.id}`:`Edycja wydania nr ${order.id}`)}
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>

@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import './App.css';
-import { BrowserRouter, HashRouter, Redirect, Route, Switch, useLocation,  } from 'react-router-dom';
+import { Redirect, Route, Switch, } from 'react-router-dom';
 import { useDispatchTyped, useSelectorTyped } from './store/helperHooks';
 import Layout from './components/Layout/Layout';
 import LoginForm from './components/LoginForm/LoginForm';
