@@ -10,11 +10,11 @@ export interface LayoutProps{
 const Layout = ({isAuthenticated, isAdmin, children}:LayoutProps)=>{
 
     return (
-        <Fragment>
+        <div style={{height: '100vh'}}>
             <MenuBar isAuthenticated={isAuthenticated}
                      isAdmin={isAdmin} />
             {children}
-        </Fragment>
+        </div>
     )
 };
 

@@ -137,7 +137,7 @@ const ItemsViewer = ({}:ItemsViewerProps)=>{
                 case AmountFilter.all:
                     break;
                 case AmountFilter.positive:
-                    candidates = candidates.filter(a=>a.amount > 0 || a.minStock > 0);
+                    candidates = candidates.filter(a=>a.amount !== 0 || a.minStock > 0);
                     break;
                 // case AmountFilter.nonZero:
                 //     candidates = candidates.filter(a=>a.amount !== 0)

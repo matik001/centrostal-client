@@ -8,6 +8,7 @@ import Logout from './components/Logout/Logout';
 import ItemsViewer from './components/ItemsViewer/ItemsViewer';
 import OrdersManager from './components/OrdersManager/OrdersManager';
 import { AuthActions } from './store/authActions';
+import MainMenu from './components/MainMenu/MainMenu';
 
 function App() {
   const isAuthenticated = useSelectorTyped(state=>state.auth?.token) != null;
@@ -39,7 +40,7 @@ function App() {
 
             <Route path="/items" component={ItemsViewer} />
             <Route path="/logout" component={Logout} />
-            <Route path="/" exact component={ItemsViewer} /> 
+            <Route path="/" exact component={MainMenu} /> 
         </Switch>
       </Layout>
     </Fragment>
