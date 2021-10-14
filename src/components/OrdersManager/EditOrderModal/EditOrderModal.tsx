@@ -10,13 +10,14 @@ import { AddButton, CloseButton, SaveButton } from "../../UI/ImageButtons/ImageB
 import Spinner from "../../UI/Spinner/Spinner";
 import safeFetch from "../../../helpers/safeFetch";
 import ItemsFilter from "../../ItemsFilter/ItemsFilter";
+import { useSelectorTyped } from "../../../store/helperHooks";
 
 export interface EditOrderModalProps{
   show: boolean;
   handleClose: ()=>void;
   handleSave: ()=>void;
-  handleCancel: ()=>void;
-  handleFinish: ()=>void;
+  handleCancel?: ()=>void;
+  handleChangeStatus?: ()=>void;
   order: Order;
   type: 'creating'|'editing';
   isSupply: boolean;
@@ -27,7 +28,7 @@ export interface EditOrderModalProps{
 
 const EditOrderModal = ({show, handleClose, handleSave, order, type,
                         handleAddOrderItem, handleChangeOrderItem, handleRemoveOrderItem,
-                        handleCancel, handleFinish, isSupply}:EditOrderModalProps) => {
+                        handleCancel, handleChangeStatus, isSupply}:EditOrderModalProps) => {
     
     const [itemNamePattern, setItemNamePattern] = useState("");
     const [current, setCurrent] = useState(null as string|null);    
@@ -41,6 +42,10 @@ const EditOrderModal = ({show, handleClose, handleSave, order, type,
     const [errorMsg, setErrorMsg] = useState(null as string|null);
 
     const addBtnRef = useRef(null);
+
+    const isAdmin = useSelectorTyped(state=>state.auth?.isAdmin);
+    const isChairman = useSelectorTyped(state=>state.auth?.isChairman);
+
 
     useEffect(()=>{
         let isNewest = true;
@@ -94,9 +99,9 @@ const EditOrderModal = ({show, handleClose, handleSave, order, type,
           <Modal.Header>
             <Modal.Title>{
                 type === 'creating' ? 
-                (isSupply ? 'Nowa dostawa' : 'Nowe wydanie') 
+                (isSupply ? 'Nowe zamówienie' : 'Nowe wydanie') 
                 :
-                (isSupply?`Edycja dostawy nr ${order.id}`:`Edycja wydania nr ${order.id}`)}
+                (isSupply?`Edycja zamówienia nr ${order.id}`:`Edycja wydania nr ${order.id}`)}
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
@@ -154,18 +159,35 @@ const EditOrderModal = ({show, handleClose, handleSave, order, type,
           <Modal.Footer>
             {type === 'editing' ? (
                 <Fragment>
-                    <Button variant="danger" onClick={handleCancel}>
-                        <Trash style={{
+                    {
+                        order.status.canAnyoneCancel 
+                            || (isAdmin && order.status.canAdminCancel)
+                            || (isChairman && order.status.canChairmanCancel)
+                        ?
+                        <Button variant="danger" onClick={handleCancel}>
+                            <Trash style={{
+                                        marginRight: 6
+                                    }}/>
+                            Anuluj
+                        </Button>
+                        :
+                        null
+                    }
+                    {
+                        order.status.canAnyoneChangeStatus 
+                            || (isAdmin && order.status.canAdminChangeStatus)
+                            || (isChairman && order.status.canChairmanChangeStatus)
+                        ?
+                        <Button variant='warning' onClick={handleChangeStatus}>
+                            <Toggles style={{
                                     marginRight: 6
                                 }}/>
-                        Anuluj
-                    </Button>
-                    <Button variant='warning' onClick={handleFinish}>
-                        <Toggles style={{
-                                marginRight: 6
-                            }}/>
-                        Zrealizuj
-                    </Button>
+                            {order.status.nextStatusMsg}
+                        </Button>
+                        :
+                        null
+                    }
+
                 </Fragment>
             ):null}
             <SaveButton onClick={handleSave}>{type==='editing' ? 'Aktualizuj' : "Zapisz"}</SaveButton>

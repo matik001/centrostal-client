@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 import { Button, ButtonProps } from "react-bootstrap";
-import { ArrowRepeat, CardText, Laptop, PlusLg, SaveFill, XCircle } from "react-bootstrap-icons";
+import { ArrowRepeat, CardList, CardText, FilePlus, FilePlusFill, JournalPlus, Laptop, PlusLg, SaveFill, XCircle } from "react-bootstrap-icons";
 import SquareButton from "../SquareButton/SquareButton";
 
 export const EditButton = (props:ButtonProps)=>(
@@ -59,6 +59,19 @@ export const RefreshModalButton = (props:ButtonProps)=>(
             ...props.style
         }}>
         <ArrowRepeat fontSize={22}/>
+    </SquareButton>
+)
+
+export const GenerateOrderModalButton = (props:ButtonProps)=>(
+    <SquareButton {...props}
+        variant="primary"
+        style={{
+            position: "fixed",
+            right: 30,
+            bottom: 90,
+            ...props.style
+        }}>
+        <CardList fontSize={22}/>
     </SquareButton>
 )
 

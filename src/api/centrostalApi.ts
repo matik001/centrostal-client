@@ -6,7 +6,7 @@ const BASE_URL = process.env.REACT_APP_API_PATH;
 
 const centrostalApiAxios = axios.create({
     baseURL: BASE_URL,
-    timeout: 3000
+    timeout: 5000
 })
 centrostalApiAxios.interceptors.response.use(response => {
     return response;
@@ -29,7 +29,11 @@ const getAuthConfig = ()=>{
 }
 
 
-
+export enum Roles{
+    ADMIN='admin',
+    BLOCKED='blocked',
+    CHAIRMAN='chairman'
+}
 export interface LoginResponseData{
     userId:string;
     firstname: string;
@@ -37,7 +41,7 @@ export interface LoginResponseData{
     username:string;
     token:string;
     expirationTime:Date;
-    isAdmin:boolean;
+    roles:string[];
 }
 export const login = async (email:string, password:string)=>{
     const data =  (await centrostalApiAxios.post("/login", {
@@ -79,6 +83,7 @@ export interface CreateItem{
     current:number;
     isOriginal:boolean;
     steelType:string;
+    minStock:number;
 }
 export interface Item extends CreateItem{
     id:number;
@@ -124,16 +129,62 @@ export const updateItem = async (id:number, item:CreateItem)=>{
 }
 
 
+
 export interface OrderItem{
     amountDelta: number;
     item: Item;
 }
+
+type StatusName = "edytowalne"|"wydane"|"anulowane"|"zrealizowane"
+|"utworzone"|"zapytane"|"nie zatwierdzone"
+|"zatwierdzone"|"zamówione";
+
+export interface OrderStatus{
+    name:StatusName;
+
+    canAnyoneEdit: boolean;
+    canAdminEdit: boolean;
+    canChairmanEdit: boolean;
+
+    canAnyoneCancel: boolean;
+    canAdminCancel: boolean;
+    canChairmanCancel: boolean;
+
+    canAnyoneChangeStatus: boolean;
+    canAdminChangeStatus: boolean;
+    canChairmanChangeStatus: boolean;
+
+    color:string;
+
+    nextStatusMsg?: string;
+}
+
+export const getDefaultStatus = ()=> ({
+    name:"edytowalne",
+
+    canAnyoneEdit: false,
+    canAdminEdit: false,
+    canChairmanEdit: false,
+
+    canAnyoneCancel: false,
+    canAdminCancel: false,
+    canChairmanCancel: false,
+
+    canAnyoneChangeStatus: false,
+    canAdminChangeStatus: false,
+    canChairmanChangeStatus: false,
+
+    color:"#ff0000",
+
+    nextStatusMsg: "Przekaż dalej"
+} as OrderStatus);  
+
 export interface Order{
     id:number;
     createdDate: Date;
     lastEditedDate?: Date;
     executedDate?: Date;
-    status:"zlecone"|"zrealizowane"|"odebrane"|"anulowane";
+    status:OrderStatus;
     isSupply: boolean;
     orderingPerson:string;
     orderItems:OrderItem[];
@@ -177,7 +228,7 @@ export const orderToCreateOrder = (order:Order)=>{
     } as CreateOrder;
 }
 
-export const createOrder = async (createOrder:CreateOrder)=>{    
+export const createOrder = async (createOrder:CreateOrder)=>{
     const res = (await centrostalApiAxios.post("/order", createOrder, getAuthConfig())).data;
     return res;
 }
@@ -186,8 +237,8 @@ export const updateOrder = async (id:number, order:CreateOrder)=>{
     await centrostalApiAxios.put(`/order/${id}`, order, getAuthConfig());
 }
 
-export const finishOrder = async (id:number)=>{
-    await centrostalApiAxios.patch(`/order/${id}/finish`, null, getAuthConfig());
+export const changeOrderStatus = async (id:number)=>{
+    await centrostalApiAxios.patch(`/order/${id}/next_status`, null, getAuthConfig());
 }
 
 export const cancelOrder = async (id:number)=>{

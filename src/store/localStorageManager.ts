@@ -2,7 +2,8 @@ export enum LocalStorageItemName {
     TOKEN = 'TOKEN',
     USER_ID = "USER_ID",
     EXPIRATION_TIME = "EXPIRATION_TIME",
-    IS_ADMIN = "IS_ADMIN"
+    IS_ADMIN = "IS_ADMIN",
+    IS_CHAIRMAN = "IS_CHAIRMAN"
 }
 
 export const getStr = (key:LocalStorageItemName) => localStorage.getItem(key);

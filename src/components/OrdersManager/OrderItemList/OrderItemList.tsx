@@ -22,6 +22,7 @@ const OrderItemList = ({orderItems,handleChangeAmount, handleDelete, type, isSup
                         <th>Oryginał</th>
                         <th>Rodzaj stali</th>
                         <th>Prąd</th>
+                        <th>Minimalnie</th>
                         {type==='edit' ? (
                             <th>Na stanie</th>
                         ):null}
@@ -45,11 +46,13 @@ const OrderItemList = ({orderItems,handleChangeAmount, handleDelete, type, isSup
                                 <td>{orderItem.item.isOriginal ? "Oryginał" : "Zamiennik"}</td>
                                 <td>{orderItem.item.steelType}</td>
                                 <td>{orderItem.item.current}A</td>
+                                <td>{orderItem.item.minStock}</td>
                                 {type === 'edit' ? (
                                     <Fragment>
                                         
                                         <td style={{
-                                                color: (newAmount >= 0 ? '#25ba75' : '#dc3546'),
+                                                color: (isSupply ? (newAmount >= orderItem.item.minStock ? '#25ba75' : '#dc3546') 
+                                                                 : (newAmount >= 0 ? '#25ba75' : '#dc3546')),
                                                 fontWeight: 'bold'
                                         }}>
                                             {orderItem.item.amount} ({isSupply ? '+' : '-'}{orderItem.amountDelta})

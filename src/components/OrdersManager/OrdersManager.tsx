@@ -1,6 +1,6 @@
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { Alert } from 'react-bootstrap';
-import { cancelOrder, createOrder, finishOrder, getOrders, Order, OrderItem, orderToCreateOrder, updateOrder } from '../../api/centrostalApi';
+import { cancelOrder, createOrder, changeOrderStatus, getDefaultStatus, getOrders, Order, OrderItem, orderToCreateOrder, updateOrder } from '../../api/centrostalApi';
 import safeFetch from '../../helpers/safeFetch';
 import { AddModalButton, RefreshModalButton } from '../UI/ImageButtons/ImageButtons';
 import Spinner from '../UI/Spinner/Spinner';
@@ -23,7 +23,7 @@ const OrdersManager = ({isSupply}:OrdersManagerProps)=>{
             id: 0,
             createdDate: new Date(),
             orderingPerson: "",
-            status: "zlecone",
+            status: getDefaultStatus(),
             orderItems: [],
             isSupply: isSupply
         } as Order;
@@ -92,9 +92,9 @@ const OrdersManager = ({isSupply}:OrdersManagerProps)=>{
 
     }, [editingOrder, refreshOrders, createNewOrder]);
 
-    const finishOrderEditingHandler = useCallback(async ()=>{
+    const changeStatusEditingHandler = useCallback(async ()=>{
         await updateOrder(editingOrder.id, orderToCreateOrder(editingOrder));
-        await finishOrder(editingOrder.id);
+        await changeOrderStatus(editingOrder.id);
         setIsEditing(false);
         await refreshOrders();
         setEditingOrder(createNewOrder());
@@ -174,7 +174,8 @@ const OrdersManager = ({isSupply}:OrdersManagerProps)=>{
                                 <EditOrderModal show={isEditing} type={editingType} handleClose={closeEditingHandler}
                                     handleSave={saveEditingHandler} order={editingOrder} handleAddOrderItem={addOrderItemHandler}
                                     handleChangeOrderItem={changeOrderItemHandler} handleRemoveOrderItem={removeOrderItemHandler}
-                                    handleCancel={cancelOrderEditingHandler} handleFinish={finishOrderEditingHandler} isSupply={isSupply}
+                                    handleCancel={cancelOrderEditingHandler} handleChangeStatus={changeStatusEditingHandler} 
+                                    isSupply={isSupply}
                                      />
                             ) : null}
                             {isViewingOrder ? (

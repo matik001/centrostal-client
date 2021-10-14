@@ -18,8 +18,8 @@ const MenuBar = ({isAuthenticated, isAdmin}:MenuBarProps)=>{
                         {isAuthenticated ?
                             <Fragment>
                                 <NavItem link="/items" text="Magazyn"/>
-                                <NavItem link="/orders" text="Wydanie"/>
-                                <NavItem link="/supplies" text="Dostawy"/>
+                                <NavItem link="/orders" text="Wydania"/>
+                                <NavItem link="/supplies" text="Zamówienia"/>
                             </Fragment>
                         : null}
                     </Nav>

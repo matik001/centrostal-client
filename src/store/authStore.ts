@@ -7,6 +7,7 @@ export interface AuthState {
     token: string | null,
     userId: string | null,
     isAdmin: boolean,
+    isChairman: boolean,
     error: string | null,
     redirectPath?: string
 }
@@ -23,7 +24,8 @@ const initialState = {
     userId: null,
     error: null,
     redirectPath: undefined,
-    isAdmin: false
+    isAdmin: false,
+    isChairman: false,
 };
 
 export const authReducer = (state: AuthState | undefined, action: AuthAction): AuthState => {
@@ -48,7 +50,8 @@ if (state === undefined) {
                 userId: actionData.userId,
                 error: null,
                 redirectPath: actionData.redirectPath,
-                isAdmin: actionData.isAdmin
+                isAdmin: actionData.isAdmin,
+                isChairman: actionData.isChairman
             }
             break;
         }
@@ -59,7 +62,8 @@ if (state === undefined) {
                 userId: null,
                 error: actionData.error,
                 redirectPath: undefined,
-                isAdmin: false
+                isAdmin: false,
+                isChairman: false
             }
             break;
         }

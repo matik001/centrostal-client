@@ -6,10 +6,10 @@ import SearchInput from "../UI/Input/SearchInput/SearchInput";
 
 
 export enum AmountFilter{
-    all = "Wybierz ilość",
-    nonZero = "Niezerowa",
-    positive = "Dodatnia",
-    negative = "Ujemna"
+    positive = "Stan magazynu",
+    all = "Wszystkie części",
+    nonZero = "Niezerowa ilość",
+    negative = "Ujemna ilość"
 }
 export interface ItemsFilterProps{
     namePattern: string;
@@ -47,7 +47,7 @@ const ItemsFilter = ({current, handleCurrentChange, handleIsOriginalChange, hand
     const [isCurrentValid, setCurrentValid] = useState(false);
     const [isSteelTypeValid, setSteelTypeValid] = useState(false);
 
-    const amountOptions = useMemo(()=>[AmountFilter.all, AmountFilter.nonZero, AmountFilter.positive, AmountFilter.negative], []);
+    const amountOptions = useMemo(()=>[AmountFilter.all, AmountFilter.positive], []);
 
     useEffect(()=>{
         const newNameSuggestions = [...new Set(itemCandidates.map(item=>item.name))];
