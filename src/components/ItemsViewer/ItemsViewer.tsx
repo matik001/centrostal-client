@@ -39,7 +39,7 @@ const ItemsViewer = ({}:ItemsViewerProps)=>{
             if(orderAmount >= 1){
                 newOrder.orderItems.push({
                     amountDelta: orderAmount,
-                    item: item
+                    item: item,
                 });
             }
         }

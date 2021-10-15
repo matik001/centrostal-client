@@ -133,6 +133,7 @@ export const updateItem = async (id:number, item:CreateItem)=>{
 export interface OrderItem{
     amountDelta: number;
     item: Item;
+    priceOne?:number;
 }
 
 type StatusName = "edytowalne"|"wydane"|"anulowane"|"zrealizowane"
@@ -153,9 +154,9 @@ export interface OrderStatus{
     canAnyoneChangeStatus: boolean;
     canAdminChangeStatus: boolean;
     canChairmanChangeStatus: boolean;
+    shouldShowPrice:boolean;
 
     color:string;
-
     nextStatusMsg?: string;
 }
 
@@ -212,6 +213,7 @@ export const getOrders = async (isSupply?:boolean)=>{
 export interface CreateOrderItem{
     amountDelta: number;
     itemId: number;
+    priceOne?:number;
 }
 export interface CreateOrder{
     isSupply: boolean;
@@ -223,7 +225,8 @@ export const orderToCreateOrder = (order:Order)=>{
         ...order,
         orderItems: order.orderItems.map(x=>({
             amountDelta: x.amountDelta,
-            itemId: x.item.id
+            itemId: x.item.id,
+            priceOne: x.priceOne
         }))
     } as CreateOrder;
 }

@@ -72,6 +72,15 @@ const EditOrderModal = ({show, handleClose, handleSave, order, type,
         } as OrderItem;
         handleChangeOrderItem(changedOrderItem);
     }, [handleChangeOrderItem]);
+
+    const changePriceHandler = useCallback((orderItem: OrderItem, price: number)=>{
+        const changedOrderItem = {
+            ...orderItem,
+            priceOne: price
+        } as OrderItem;
+        handleChangeOrderItem(changedOrderItem);
+    }, [handleChangeOrderItem]);
+
     const deleteOrderItemHandler = useCallback((orderItem: OrderItem) => {
         handleRemoveOrderItem(orderItem);
     }, [handleRemoveOrderItem]);
@@ -148,11 +157,14 @@ const EditOrderModal = ({show, handleClose, handleSave, order, type,
                 </Overlay>
             </div>
             <div className="mt-4"></div>
-            <OrderItemList handleChangeAmount={changeAmountHandler} 
+            <OrderItemList handleChangeAmount={changeAmountHandler}
                             handleDelete={deleteOrderItemHandler}
                             orderItems={order.orderItems} 
                             type='edit'
-                            isSupply={isSupply} />
+                            isSupply={isSupply} 
+                            shouldShowPrice={order.status.shouldShowPrice}
+                            handleChangePrice={changePriceHandler} 
+                            />
 
             {isLoading ? <Spinner /> : null}
           </Modal.Body>
