@@ -50,15 +50,18 @@ const ItemsFilter = ({current, handleCurrentChange, handleIsOriginalChange, hand
     const amountOptions = useMemo(()=>[AmountFilter.all, AmountFilter.positive], []);
 
     useEffect(()=>{
-        const newNameSuggestions = [...new Set(itemCandidates.map(item=>item.name))];
+        let newNameSuggestions = [...new Set(itemCandidates.map(item=>item.name))];
+        newNameSuggestions = newNameSuggestions.sort();
         setNames(newNameSuggestions);
     }, [itemCandidates]);
     useEffect(()=>{
-        const newSteelTypes = [...new Set(itemCandidates.map(item=>item.steelType))];
+        let newSteelTypes = [...new Set(itemCandidates.map(item=>item.steelType))];
+        newSteelTypes = newSteelTypes.sort();
         setSteelTypes(newSteelTypes)
     }, [itemCandidates]);
     useEffect(()=>{
-        const newCurrents = [...new Set(itemCandidates.map(item=>item.current))];
+        let newCurrents = [...new Set(itemCandidates.map(item=>item.current))];
+        newCurrents = newCurrents.sort((a:number, b:number)=>a-b);
         setCurrents(newCurrents.map(a=>a.toString()));
     }, [itemCandidates]);
     
