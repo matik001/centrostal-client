@@ -1,5 +1,3 @@
-import { AxiosError } from 'axios';
-import { AppThunkAction } from './';
 import type { AuthAction, LoginError, LoginSucessfulAction } from './authActions';
 // STATE
 

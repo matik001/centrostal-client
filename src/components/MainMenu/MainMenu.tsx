@@ -1,7 +1,7 @@
-import { Fragment } from "react";
-import { Container, Nav, Navbar } from "react-bootstrap";
 import MainMenuItem from "./MainMenuItem/MainMenuItem";
-
+import storeImgSrc from '../../images/magazyn.jpg'
+import givingImgSrc from '../../images/wydania.webp'
+import ordersImgSrc from '../../images/zamowienia.jpg'
 
 const MainMenu = ()=>{
     return (
@@ -17,18 +17,18 @@ const MainMenu = ()=>{
             <MainMenuItem
                     link="/items"
                     title="Stan magazynu"
-                    imgSrc='https://www.globalsparesexchange.com/uploads/8/3/4/2/83427492/part-01_orig.jpg'
+                    imgSrc={storeImgSrc}
                     />                    
             <MainMenuItem
                     link="/orders"
                     title="Wydania" 
-                    imgSrc='https://yb4ke1guf9g32qn4pnt1k17m-wpengine.netdna-ssl.com/wp-content/uploads/2019/01/Amazon-Warehouse.jpeg.webp'
+                    imgSrc={givingImgSrc}
                     />                    
                     
             <MainMenuItem
                     link="/supplies"
                     title="Zamówienia" 
-                    imgSrc='https://cdn.pixabay.com/photo/2018/09/19/11/34/warehouse-3688280_960_720.jpg'
+                    imgSrc={ordersImgSrc}
                     />                    
                     
         </div>

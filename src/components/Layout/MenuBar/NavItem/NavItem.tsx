@@ -1,5 +1,5 @@
 import { Nav } from "react-bootstrap";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Location } from "history";
 
 interface NavItemProps{
