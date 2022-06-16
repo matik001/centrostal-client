@@ -1,46 +1,35 @@
-# Getting Started with Create React App
+## CentrostalAPI _by Mateusz Kisiel_
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+### O repozytorium:
+Projekt składa się z backendu (ASP.NET Core Web Api - Rest w C#) oraz frontendu napisanego w React'cie.
+To repozytorium zawiera sam backend (frontend jest w innym).
 
-## Available Scripts
+### Opis projektu:
+Projekt ma za zadanie zarzadzać magazynem części (w tym przypadku części do wypalarki plazmowej). 
 
-In the project directory, you can run:
+Po zalogowaniu użytkownik może wyszukać i filtrować części znajdujące się na magazynie. Jeżeli ilość którejść spadnie poniżej zapasu minimalnego osoba pracująca na magazynie może rozpocząć zamówienie z potrzebnymi częściami. Następnie zamówienie te musi zatwierdzić kierownik (na każdym etapie można anulować lub edytować zamówienie). Nastpenie zatwierdza prezes i wtedy może dojść do zamówienie u dostawcy. Gdy części dojdą pracownik zatwierdza to w aplikacji, a ilości magazynowe się aktualizują. 
 
-### `npm start`
+W przypadku wydawania części może to zrobić pracownik magazynu samemu.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Wszystkie zamówienia zapisują się w historii, i nie ma możliwości, że ktoś oszuka.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### Screeny programu:
 
-### `npm test`
+![](screenshots/screen1menu.jpg)
+![](screenshots/screen5zamowienia.jpg)
+![](screenshots/screen3edycja.jpg)
+![](screenshots/screen4ceny.jpg)
+![](screenshots/screen6magazyn.jpg)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Jak uruchomić:
+#### Backand:
+1) Dodać dane dostępu do bazy danych SQL Server do projektu
+2) Wywołać Update-Database aby wykonać migracje
+3) Odpalić serwer
+4) Dodać userów poprzez request do /register w Swaggerze lub Postmanie
+5) Ustawić user roles w sql'u w tabeli userRoles 
 
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+#### Frontend:
+1) Ustawić adres serwera api w pliku .env
+2) Odpalić npm install
+3) Odpalić npm start
